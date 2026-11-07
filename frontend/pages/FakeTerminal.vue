@@ -112,7 +112,9 @@ export default defineComponent({
         response: 'Loading...'
       })
 
-      const currentIndex = this.history.length - 1
+      const currentEntry = this.history[this.history.length - 1]
+
+      if (!currentEntry) return
 
       this.currentCommand = ''
 
@@ -135,13 +137,13 @@ export default defineComponent({
 
         const data = await response.text()
 
-        this.history[currentIndex].response = data
+        currentEntry.response = data
 
       } catch (error) {
 
         console.error(error)
 
-        this.history[currentIndex].response =
+        currentEntry.response =
           'Connection error'
 
       }

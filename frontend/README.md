@@ -40,7 +40,7 @@ Le projet est organisé autour d'une architecture Frontend / Backend séparée.
 
 ## Frontend
 
-Le frontend est développé avec Nuxt 3 et fournit :
+Le frontend est développé avec Nuxt 4 et fournit :
 
 * Interface utilisateur
 * Dashboard
@@ -50,7 +50,7 @@ Le frontend est développé avec Nuxt 3 et fournit :
 
 ### Stack
 
-* Nuxt 3
+* Nuxt 4
 * Vue 3
 * TypeScript
 * Pinia
@@ -104,14 +104,14 @@ Le projet est conçu pour être déployé via Docker afin de simplifier l'instal
 
 ## Prérequis
 
-* Node.js 20+
+* Node.js 22.22.3+ (branche 22), 24.15.0+ (branche 24) ou 26+
 * PostgreSQL
 * Docker (optionnel)
 
 ## Installation
 
 ```bash
-npm install
+npm ci
 ```
 
 ## Lancement du serveur de développement
@@ -125,6 +125,27 @@ Le frontend sera accessible à l'adresse :
 ```text
 http://localhost:3000
 ```
+
+## Vérification des dépendances
+
+```bash
+npm audit
+npm audit --omit=dev
+npm run build
+```
+
+Les overrides de `package.json` ciblent uniquement `glob` dans `@vercel/nft`
+et `minimatch` dans `readdir-glob`. Ils utilisent les versions corrigées tant
+que ces outils de compilation gardent des plages de versions vulnérables.
+Le build vérifie notamment le traçage des fichiers de Nitro avec ces versions.
+
+L'alerte faible [GHSA-gcqx-w48m-w2h4 sur deepmerge](https://github.com/advisories/GHSA-gcqx-w48m-w2h4)
+reste présente au 7 novembre 2026 : aucun correctif n'est publié pour `deepmerge`
+4.3.1. Elle vient de `@rollup/plugin-node-resolve`, utilisé par Nitro, et remonte
+dans les paquets Nuxt qui en dépendent. Elle apparaît aussi avec `--omit=dev`,
+car Nuxt est déclaré dans les dépendances du projet. On conserve ce signalement
+en attendant un correctif amont, sans rétrograder Nuxt ni remplacer la bibliothèque
+par un fork non vérifié.
 
 ---
 

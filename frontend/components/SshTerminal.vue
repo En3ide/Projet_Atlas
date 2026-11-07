@@ -53,13 +53,8 @@ onMounted(() => {
   term.write('atlas@server:~$ ')
 
   /*
-    -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-    BACKEND SSH RÉEL
-    -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-
-    Pour tester le vrai backend :
-    1. Décommente ce bloc.
-    2. Supprime ou commente le bloc "SIMULATION TERMINAL" plus bas.
+    Pour brancher le terminal au serveur SSH, on décommente ce bloc
+    et on désactive le bloc de simulation juste en dessous.
 
     socket = new WebSocket('ws://localhost:3001')
 
@@ -84,16 +79,12 @@ onMounted(() => {
     })
   */
 
-  /*
-    -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-    SIMULATION TERMINAL
-    -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-  */
+  // Pour l'instant, on simule les commandes du terminal
 
   term.onData((data) => {
     if (!term) return
 
-    // ENTER
+    // Entrée : on lance la commande et on passe à la ligne suivante
     if (data === '\r') {
       term.write('\r\n')
       handleCommand(currentLine)
@@ -102,7 +93,7 @@ onMounted(() => {
       return
     }
 
-    // BACKSPACE
+    // Retour arrière : on efface le dernier caractère
     if (data === '\u007F') {
       if (currentLine.length > 0) {
         currentLine = currentLine.slice(0, -1)

@@ -175,7 +175,7 @@ export default defineComponent({
 
 <style scoped>
 
-/* -_-_-_-_-_ VIDEO GRID -_-_-_-_-_ */
+/* Grille des caméras */
 
 .video-pannel {
     display: grid;
@@ -190,7 +190,7 @@ export default defineComponent({
     width: 100%;
 }
 
-/* -_-_-_-_-_ CAMERA CARD -_-_-_-_-_ */
+/* Panneau de chaque caméra */
 
 .camera-card {
     padding: 0;
@@ -200,7 +200,7 @@ export default defineComponent({
     min-height: 360px;
 }
 
-/* -_-_-_-_-_ HEADER -_-_-_-_-_ */
+/* Nom de la caméra et état du flux */
 
 .camera-header {
     height: 60px;
@@ -225,7 +225,7 @@ export default defineComponent({
     font-size: 18px;
 }
 
-/* -_-_-_-_-_ STATUS -_-_-_-_-_ */
+/* Badge du flux vidéo */
 
 .camera-status {
     color: rgb(0,255,120);
@@ -244,7 +244,7 @@ export default defineComponent({
     font-weight: bold;
 }
 
-/* -_-_-_-_-_ VIDEO -_-_-_-_-_ */
+/* Affichage de la vidéo */
 
 .camera-video {
     width: 100%;
@@ -258,7 +258,7 @@ export default defineComponent({
     object-fit: cover;
 }
 
-/* -_-_-_-_-_ RESPONSIVE -_-_-_-_-_ */
+/* On adapte la grille à la taille de l'écran */
 
 @media screen and (max-width: 1400px) {
 

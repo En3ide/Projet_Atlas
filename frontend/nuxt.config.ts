@@ -1,8 +1,18 @@
-// nuxt.config.ts
-// https://nuxt.com/docs/api/configuration/nuxt-config
+// Config générale du front
+// Doc Nuxt : https://nuxt.com/docs/api/configuration/nuxt-config
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
+
+  // On garde les dossiers du front à la racine avec Nuxt 4
+  srcDir: '.',
+  dir: {
+    app: 'app',
+  },
+
+  devServer: {
+    port: 3000,
+  },
 
   devtools: {
     enabled: process.env.NODE_ENV !== 'production',
@@ -80,6 +90,14 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
+
+  postcss: {
+    plugins: {
+      // Nuxt 4 a besoin du chemin complet pour charger ce plugin
+      'tailwindcss/nesting': false,
+      'tailwindcss/nesting/index.js': {},
+    },
+  },
 
   imports: {
     dirs: [

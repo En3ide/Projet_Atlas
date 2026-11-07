@@ -3,7 +3,7 @@
 
     <div class="pannel lan-pannel">
 
-      <!-- HEADER -->
+      <!-- Titre et bouton pour lancer le scan -->
       <div class="lan-header">
 
         <div>
@@ -14,13 +14,37 @@
           </p>
         </div>
 
-        <div class="lan-status">
-          {{ devices.length }} appareils
+        <div class="lan-actions">
+          <span v-if="hasScanned" class="lan-status">
+            {{ devices.length }} appareil{{ devices.length === 1 ? '' : 's' }}
+          </span>
+
+          <button
+            class="scan-button"
+            type="button"
+            :disabled="loading"
+            @click="loadDevices"
+          >
+            {{ loading ? 'Scan en cours…' : 'Scanner le réseau' }}
+          </button>
         </div>
 
       </div>
 
-      <!-- TABLE -->
+      <p v-if="errorMessage" class="scan-message scan-error" role="alert">
+        {{ errorMessage }}
+      </p>
+
+      <p v-else-if="!hasScanned && !loading" class="scan-message">
+        Lance un scan pour afficher les appareils détectés sur ton réseau.
+      </p>
+
+      <p v-if="hasScanned && scannedAt" class="scan-time">
+        Dernier scan : {{ new Date(scannedAt).toLocaleString('fr-FR') }}
+        ({{ scannedNetwork }})
+      </p>
+
+      <!-- Appareils trouvés sur le réseau -->
       <div class="table-wrapper">
 
         <table class="lan-table">
@@ -57,10 +81,19 @@
 
           <tbody>
 
-            <tr
-              v-for="device in sortedDevices"
-              :key="device.mac"
-            >
+            <tr v-if="loading">
+              <td colspan="6" class="table-message">Scan du réseau en cours…</td>
+            </tr>
+
+            <tr v-else-if="hasScanned && devices.length === 0 && !errorMessage">
+              <td colspan="6" class="table-message">Aucun appareil détecté.</td>
+            </tr>
+
+            <template v-else>
+              <tr
+                v-for="device in sortedDevices"
+                :key="device.id"
+              >
 
               <td>
                 {{ device.hostname }}
@@ -93,7 +126,8 @@
                 </span>
               </td>
 
-            </tr>
+              </tr>
+            </template>
 
           </tbody>
 
@@ -108,6 +142,7 @@
 
 <script lang="ts">
 type Device = {
+  id: string
   hostname: string
   ipv4: string
   mac: string
@@ -116,15 +151,34 @@ type Device = {
   status: string
 }
 
+type DeviceScanResponse = {
+  network: string
+  scannedAt: string
+  devices: Device[]
+}
+
 type SortKey = keyof Device
 type SortDirection = 'asc' | 'desc'
 
 export default {
   name: 'LAN',
 
+  setup() {
+    const config = useRuntimeConfig()
+
+    return {
+      apiBase: config.public.apiBase,
+    }
+  },
+
   data() {
     return {
       devices: [] as Device[],
+      loading: false,
+      hasScanned: false,
+      errorMessage: '',
+      scannedAt: '',
+      scannedNetwork: '',
 
       currentSort: 'hostname' as SortKey,
 
@@ -157,68 +211,45 @@ export default {
 
   methods: {
     async loadDevices() {
+      this.loading = true
+      this.errorMessage = ''
+
       try {
-        const response = await fetch('/api/lan/scan')
+        const response = await fetch(`${this.apiBase}/api/devices`)
 
         if (!response.ok) {
-          throw new Error('API ERROR')
+          const error = await response.json().catch(() => null)
+          const message = typeof error?.message === 'string'
+            ? error.message
+            : `Erreur API (${response.status})`
+          throw new Error(message)
         }
 
-        const data = await response.json()
+        const data = await response.json() as DeviceScanResponse
 
-        if (!Array.isArray(data) || data.length === 0) {
-          throw new Error('INVALID DATA')
+        if (!Array.isArray(data.devices)) {
+          throw new Error('La réponse du serveur est invalide.')
         }
 
-        this.devices = data
+        this.devices = data.devices
+        this.scannedAt = data.scannedAt
+        this.scannedNetwork = data.network
+        this.hasScanned = true
       } catch (error) {
         console.error(
           'Impossible de récupérer les appareils réseau :',
           error
         )
 
-        this.devices = [
-          {
-            hostname: 'atlas-server',
-            ipv4: '192.168.1.1',
-            mac: 'A4:5E:60:11:2F:90',
-            vendor: 'Intel',
-            type: 'Serveur / NAS',
-            status: 'ONLINE',
-          },
-          {
-            hostname: 'desktop-main',
-            ipv4: '192.168.1.10',
-            mac: '34:97:F6:8A:21:BC',
-            vendor: 'Realtek',
-            type: 'PC',
-            status: 'ONLINE',
-          },
-          {
-            hostname: 'raspberrypi-home',
-            ipv4: '192.168.1.20',
-            mac: 'B8:27:EB:42:19:FA',
-            vendor: 'Raspberry Pi',
-            type: 'IoT',
-            status: 'ONLINE',
-          },
-          {
-            hostname: 'camera-entry',
-            ipv4: '192.168.1.31',
-            mac: 'E0:50:8B:91:42:AA',
-            vendor: 'TP-Link',
-            type: 'Caméra IP',
-            status: 'ONLINE',
-          },
-          {
-            hostname: 'phone-test',
-            ipv4: '192.168.1.42',
-            mac: '9C:2A:70:55:18:CC',
-            vendor: 'Samsung',
-            type: 'Smartphone',
-            status: 'OFFLINE',
-          },
-        ]
+        this.devices = []
+        this.hasScanned = false
+        this.scannedAt = ''
+        this.scannedNetwork = ''
+        this.errorMessage = error instanceof Error
+          ? error.message
+          : 'Une erreur inattendue est survenue pendant le scan.'
+      } finally {
+        this.loading = false
       }
     },
 
@@ -232,12 +263,44 @@ export default {
     },
   },
 
-  mounted() {
-    this.loadDevices()
-  },
 }
 </script>
 <style scoped>
+
+.lan-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.scan-button {
+    padding: 10px 16px;
+    border: 1px solid rgba(0,255,120,0.25);
+    border-radius: 12px;
+    color: rgb(0,255,120);
+    background: rgba(0,255,120,0.1);
+    font: inherit;
+    cursor: pointer;
+}
+
+.scan-button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.scan-message,
+.scan-time {
+    color: rgba(255,255,255,0.65);
+}
+
+.scan-error {
+    color: rgb(255,120,120);
+}
+
+.table-message {
+    text-align: center !important;
+    color: rgba(255,255,255,0.65) !important;
+}
 
 .lan-pannel {
     width: 100%;
@@ -245,7 +308,7 @@ export default {
     min-height: 85vh;
 }
 
-/* -_-_-_- HEADER -_-_-_- */
+/* Haut du panneau */
 
 .lan-header {
     display: flex;
@@ -268,7 +331,7 @@ export default {
     color: rgba(255,255,255,0.55);
 }
 
-/* -_-_-_- STATUS -_-_-_- */
+/* Nombre d'appareils détectés */
 
 .lan-status {
     padding: 10px 18px;
@@ -285,7 +348,7 @@ export default {
     font-weight: bold;
 }
 
-/* -_-_-_- TABLE -_-_-_- */
+/* Tableau des appareils */
 
 .table-wrapper {
     width: 100%;
@@ -339,7 +402,7 @@ export default {
     background-color: rgba(255,255,255,0.03);
 }
 
-/* -_-_-_- STATUS -_-_-_- */
+/* État de chaque appareil */
 
 .status {
     padding: 6px 10px;
@@ -364,7 +427,7 @@ export default {
       rgba(255,95,86,0.12);
 }
 
-/* -_-_-_- RESPONSIVE -_-_-_- */
+/* Affichage sur les petits écrans */
 
 @media screen and (max-width: 768px) {
 
@@ -374,6 +437,10 @@ export default {
         align-items: flex-start;
 
         gap: 16px;
+    }
+
+    .lan-actions {
+        flex-wrap: wrap;
     }
 }
 

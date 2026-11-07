@@ -23,7 +23,7 @@
 
         <div class="file-browser">
 
-          <!-- HEADER -->
+          <!-- Colonnes du navigateur de fichiers -->
           <div class="file-row file-head">
 
             <span @click="sortBy('name')" class="sortable">
@@ -44,7 +44,7 @@
 
           </div>
 
-          <!-- FILES -->
+          <!-- Liste des fichiers et dossiers -->
           <div
             v-for="file in sortedFiles"
             :key="file.name"

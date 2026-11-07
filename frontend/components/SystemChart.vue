@@ -1,7 +1,7 @@
 <template>
   <div class="grid-pannels">
 
-    <!-- CPU -->
+    <!-- Température du CPU -->
     <div class="pannel">
       <h2>CPU Temperature</h2>
 
@@ -11,7 +11,7 @@
       />
     </div>
 
-    <!-- RAM -->
+    <!-- Utilisation de la RAM -->
     <div class="pannel">
       <h2>RAM Usage</h2>
 
@@ -21,7 +21,7 @@
       />
     </div>
 
-    <!-- Réseau -->
+    <!-- Trafic réseau -->
     <div class="pannel">
       <h2>Network Traffic</h2>
 
@@ -65,9 +65,7 @@ ChartJS.register(
   Filler
 )
 
-/* =========================
-   CPU TEMPERATURE
-========================= */
+// Valeurs d'exemple pour la température du CPU
 
 const cpuTempData = {
   labels: [
@@ -98,9 +96,7 @@ const cpuTempData = {
   ]
 }
 
-/* =========================
-   RAM USAGE
-========================= */
+// Valeurs d'exemple pour la RAM
 
 const ramData = {
   labels: [
@@ -122,9 +118,7 @@ const ramData = {
   ]
 }
 
-/* =========================
-   NETWORK TRAFFIC
-========================= */
+// Valeurs d'exemple pour le trafic réseau
 
 const networkData = {
   labels: [
@@ -167,9 +161,7 @@ const networkData = {
   ]
 }
 
-/* =========================
-   OPTIONS
-========================= */
+// Réglages des graphiques
 
 const chartOptions = {
   responsive: true,

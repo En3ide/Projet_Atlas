@@ -2,26 +2,26 @@
   <div class="contenu">
     <div class="pannel terminal-pannel">
 
-      <!-- HEADER -->
+      <!-- Titre du terminal -->
       <div class="terminal-header">
         <div class="terminal-title">
           atlas@terminal
         </div>
       </div>
 
-      <!-- TERMINAL -->
+      <!-- Zone du terminal -->
       <div
         class="terminal-body"
         @click="focusInput"
       >
 
-        <!-- HISTORIQUE -->
+        <!-- Commandes déjà envoyées -->
         <div
           v-for="(line, index) in history"
           :key="index"
         >
 
-          <!-- COMMANDE -->
+          <!-- Commande saisie -->
           <div class="terminal-line">
 
             <span class="prompt">
@@ -34,7 +34,7 @@
 
           </div>
 
-          <!-- RÉPONSE -->
+          <!-- Réponse à la commande -->
           <div
             v-if="line.response"
             class="terminal-response"
@@ -44,7 +44,7 @@
 
         </div>
 
-        <!-- INPUT -->
+        <!-- Saisie de la prochaine commande -->
         <div class="terminal-line">
 
           <span class="prompt">
@@ -112,7 +112,9 @@ export default defineComponent({
         response: 'Loading...'
       })
 
-      const currentIndex = this.history.length - 1
+      const currentEntry = this.history[this.history.length - 1]
+
+      if (!currentEntry) return
 
       this.currentCommand = ''
 
@@ -135,13 +137,13 @@ export default defineComponent({
 
         const data = await response.text()
 
-        this.history[currentIndex].response = data
+        currentEntry.response = data
 
       } catch (error) {
 
         console.error(error)
 
-        this.history[currentIndex].response =
+        currentEntry.response =
           'Connection error'
 
       }
@@ -166,7 +168,7 @@ export default defineComponent({
 
 <style scoped>
 
-/* ===== TERMINAL ===== */
+/* Panneau du terminal */
 
 .terminal-pannel {
     width: 100%;
@@ -183,7 +185,7 @@ export default defineComponent({
     border: 1px solid rgba(255,255,255,0.05);
 }
 
-/* ===== HEADER ===== */
+/* Haut du terminal */
 
 .terminal-header {
     height: 60px;
@@ -209,7 +211,7 @@ export default defineComponent({
     letter-spacing: 1px;
 }
 
-/* ===== BODY ===== */
+/* Zone des commandes */
 
 .terminal-body {
     padding: 24px;
@@ -225,7 +227,7 @@ export default defineComponent({
     cursor: text;
 }
 
-/* ===== LINES ===== */
+/* Lignes du terminal */
 
 .terminal-line {
     display: flex;
@@ -248,7 +250,7 @@ export default defineComponent({
     color: white;
 }
 
-/* ===== RESPONSE ===== */
+/* Affichage des réponses */
 
 .terminal-response {
     color: rgba(0,255,156,0.8);
@@ -260,7 +262,7 @@ export default defineComponent({
     white-space: pre-wrap;
 }
 
-/* ===== INPUT ===== */
+/* Zone de saisie */
 
 .input-container {
     position: relative;
@@ -277,7 +279,7 @@ export default defineComponent({
     white-space: pre;
 }
 
-/* ===== CURSOR ===== */
+/* Curseur du terminal */
 
 .cursor {
     width: 10px;
@@ -305,7 +307,7 @@ export default defineComponent({
     }
 }
 
-/* ===== INPUT INVISIBLE ===== */
+/* On masque le champ de saisie pour garder l'affichage du terminal */
 
 .hidden-input {
     position: absolute;

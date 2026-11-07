@@ -14,13 +14,10 @@
 
     --shadow-panel: 0 0 25px rgba(0, 0, 0, 0.35);
 
-    /* Fonts */
+    /* Police utilisée dans l'interface */
     --font-main: "Doto", sans-serif;
 
-    /*
-     * Ces variables existent également dans style_def.css.
-     * On les redéfinit ici pour éviter que les titres utilisent system-ui.
-     */
+    /* On garde la même police pour le texte, les titres et le monospace */
     --sans: var(--font-main);
     --heading: var(--font-main);
     --mono: var(--font-main);
@@ -52,10 +49,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/*
- * Force Doto sur les éléments texte.
- * Cela évite notamment que style_def.css remette system-ui sur h1/h2.
- */
+/* On applique la police du thème aux éléments de texte */
 h1,
 h2,
 h3,
@@ -234,11 +228,7 @@ code {
     font-size: 24px;
 }
 
-/*
- * Important :
- * les Material Icons doivent conserver leur propre police.
- * Sans ça, "home", "settings", etc. pourraient apparaître sous forme de texte.
- */
+/* On garde la police des icônes pour afficher les symboles à la place de leur nom */
 .material-icons {
     font-family: "Material Icons";
     font-weight: normal;

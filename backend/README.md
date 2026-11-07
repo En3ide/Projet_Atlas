@@ -27,8 +27,10 @@
 
 ## Project setup
 
+Use Node.js 22.22.3 or later within version 22, Node.js 24.15.0 or later within version 24, or Node.js 26 and later, as required by the Nest CLI's Angular DevKit dependency. Node.js 24.22.2 was used to validate this project.
+
 ```bash
-$ npm install
+$ npm ci
 ```
 
 ## Compile and run the project
@@ -61,14 +63,21 @@ $ npm run test:cov
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Build the API before starting it in production:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+$ npm ci
+$ npm run build
+$ npm run start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+On Linux, install the native ARP scanner with `npm run deploy:native`. The script uses `sudo` for installation and grants `cap_net_raw` to the scanner. The account running Nest must belong to the selected group; see `npm run deploy:native -- --help` for the options.
+
+## Dependency security
+
+The targeted npm overrides keep `glob` and `minimatch` on patched versions while Jest's dependencies still request affected releases. Run `npm audit` after updating dependencies and remove these overrides when upstream packages adopt the fixes.
+
+Jest's `jest-config` still depends on `deepmerge` 4.3.1, affected by [GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4). No patched version is available as of November 7, 2026. It is used by development tooling, and the production dependency audit is clean. Keep Jest configuration and presets trusted, and update this dependency when a fix is released.
 
 ## Observability
 
@@ -110,7 +119,6 @@ Check out a few resources that may come in handy when working with NestJS:
 - Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
 - For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
 - To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
 - Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
 - Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
 - Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
